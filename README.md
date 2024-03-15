@@ -5,8 +5,8 @@ A small tool for making levels for Ozee in Gleed2d, made in Python 3.
 # Requirements
 + Python 3: https://www.python.org/downloads/
 + A copy of the level editor, Gleed2d: https://github.com/hzl2928963/gleed2d/releases/tag/1.4.0
++ the XNA Framework Redistributable (which makes Gleed work) https://www.microsoft.com/en-us/download/details.aspx?id=15163
 + The JPEXS Flash decompiler: https://github.com/jindrapetrik/jpexs-decompiler/releases
-+ the XNA Framework Redistributable https://www.microsoft.com/en-us/download/details.aspx?id=15163
 + A .swf of Ozee, either from Flashpoint (https://flashpointarchive.org/downloads) or from the speedrun.com page (https://www.speedrun.com/ozee)
 
 # Setting up a level
