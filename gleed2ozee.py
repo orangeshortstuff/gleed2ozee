@@ -115,7 +115,7 @@ def export_to_ozee(objects, filename: str):
     with open(filename, "a") as f: # re-make the map
         # write the header
         f.write("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n")
-        f.write("<map xmin=\"-500\" ymin=\"-60\" xmax=\"1000\" ymax=\"20\" color=\"0x3a554d\" bg=\"assets.background.Forest\">\n")
+        f.write("<map xmin=\"-500\" ymin=\"-100\" xmax=\"1000\" ymax=\"50\" color=\"0x3a554d\" bg=\"assets.background.Forest\">\n")
         f.write("\t<front>\n\n\t</front>\n") # blank front layer
         f.write("\t<middle>\n") # start of middle layer
         back_objs = []
@@ -137,18 +137,27 @@ def export_to_ozee(objects, filename: str):
                     f.write("\t\t<el id=\"" + name + "\" type=\"Spikes\" static=\"true\" x=\""+ 
                         str(position[0]) +"\" y=\"" + str(position[1]) +"\" w=\"" + 
                         str(scale[0]) + "\" a=\"" + str(rotation) + "\" />\n")
-                elif obj_type in scaleable_objects: # non-static object - default to the Rock material
+                elif obj_type in scaleable_objects: # non-static object - default to the Ice material
                     if obj_type == "Rectangle":
-                        f.write("\t\t<el id=\"" + name + "\" type=\"Box\" material=\"Rock\" static=\"false\" x=\""+ 
+                        f.write("\t\t<el id=\"" + name + "\" type=\"Box\" material=\"Ice\" static=\"false\" x=\""+ 
                         str(position[0]) +"\" y=\"" + str(position[1]) +"\" w=\"" + 
                         str(scale[0]) + "\" h=\"" + str(scale[1]) + "\" a=\"" + str(rotation) + "\" />\n")
                     elif obj_type == "Circle":
-                        f.write("\t\t<el id=\"" + name + "\" type=\"Wheel\" material=\"Rock\" static=\"false\" x=\""+ 
+                        f.write("\t\t<el id=\"" + name + "\" type=\"Wheel\" material=\"Ice\" static=\"false\" x=\""+ 
                         str(position[0]) +"\" y=\"" + str(position[1]) +"\" r=\"" + 
-                        str(scale) + "\" a=\"" + str(rotation) + "\" />\n")
+                        str(scale) + "\" />\n")
                 else: # door, checkpoint, or coin
                     if obj_type == "Coin":
                         f.write("\t\t<el type=\"Coin\" x=\""+ str(position[0]) +"\" y=\"" + str(position[1]) +"\" />\n")
+                    elif obj_type == "Button":
+                        f.write("\t\t<el id=\"" + name + "\" type=\"ButtonSwitch\" static=\"true\" x=\"" +
+                                str(position[0]) +"\" y=\"" + str(round(position[1] + 0.14,2)) + "\" a=\"" + str(rotation) + "\" />\n")
+                    elif obj_type == "Lever":
+                        f.write("\t\t<el id=\"" + name + "\" type=\"LeverSwitch\" mode=\"ThreeStateSpring\" static=\"true\" x=\"" +
+                                str(position[0]) +"\" y=\"" +  str(round(position[1] + 0.5,2)) + "\" a=\"" + str(rotation) + "\" pos=\"Center\" />\n")
+                    elif obj_type == "Hang":
+                        f.write("\t\t<el id=\"" + name + "\" type=\"HangSwitch\" static=\"true\" x=\"" +
+                                str(position[0]) +"\" y=\"" + str(position[1]) + "\" a=\"" + str(rotation) + "\" />\n")
                     elif obj_type == "Door" or obj_type == "Checkpoint":
                         back_objs.append(obj)
 
