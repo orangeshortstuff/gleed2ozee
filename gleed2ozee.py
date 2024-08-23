@@ -39,22 +39,19 @@ def import_from_gleed(filename: str):
         else:
             print("no position found")
 
-        if "Rotation" in tags: # look for a position tag
+        if "Rotation" in tags: # look for a rotation tag
             idx = tags.index("Rotation") # get the index
-            # split into x and y position, and append
+            # scale to 2 decimal places
             struct.append(round(float(item[idx].text), 2)) 
         else:
             struct.append(0.0)
-            #print("no rotation found")
 
         if "asset_name" in tags: # search for asset name
             idx = tags.index("asset_name")
-            #print(idx, item[idx].text)
             struct.append(item[idx].text) # texture name becomes the type
 
             if "Scale" in tags:
                 idx = tags.index("Scale")
-                # print(idx, item[idx][0].text, item[idx][1].text)
                 # convert to ozee units
                 temp_scale = [float(item[idx][0].text) * size_factor,
                             float(item[idx][1].text) * size_factor]
@@ -62,13 +59,10 @@ def import_from_gleed(filename: str):
                 print("no scale found")
 
         else: # we're dealing with a primitive (rectangle / circle)
-            #print("no texture found")
-
             if "Height" in tags and "Width" in tags: # rectangle case
                 struct.append("rectangle")
                 idx = tags.index("Width")
                 idx2 = tags.index("Height")
-                # print(idx, item[idx][0].text, item[idx][1].text)
                 # convert to ozee units
                 temp_scale = [round(float(item[idx].text) / pixels_per_unit, 2),
                             round(float(item[idx2].text) / pixels_per_unit, 2)]
@@ -92,11 +86,6 @@ def import_from_gleed(filename: str):
         item_structs.append(struct)
 
     end_time = time.perf_counter_ns()
-    
-    for struct in item_structs:
-        #print(struct)
-        pass
-
     return item_structs
 
 def export_to_ozee(objects, filename: str):
@@ -107,15 +96,13 @@ def export_to_ozee(objects, filename: str):
         with open(filename, "x") as f: # create new file if it doesn't exist
             pass
     except:
-        #print("File already exists.")
         pass
     with open(filename, "w") as f: # remove file contents
         pass
 
     with open(filename, "a") as f: # re-make the map
-        # write the header
-        f.write("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n")
-        f.write("<map xmin=\"-500\" ymin=\"-100\" xmax=\"1000\" ymax=\"50\" color=\"0x3a554d\" bg=\"assets.background.Forest\">\n")
+        f.write("<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n") # normie xml header
+        f.write("<map xmin=\"-500\" ymin=\"-200\" xmax=\"1000\" ymax=\"20\" color=\"0x3a554d\" bg=\"assets.background.Forest\">\n") # max map dimensions, and background
         f.write("\t<front>\n\n\t</front>\n") # blank front layer
         f.write("\t<middle>\n") # start of middle layer
         back_objs = []
@@ -146,7 +133,7 @@ def export_to_ozee(objects, filename: str):
                         f.write("\t\t<el id=\"" + name + "\" type=\"Wheel\" material=\"Ice\" static=\"false\" x=\""+ 
                         str(position[0]) +"\" y=\"" + str(position[1]) +"\" r=\"" + 
                         str(scale) + "\" />\n")
-                else: # door, checkpoint, or coin
+                else: # door, checkpoint, coin, or button / switch
                     if obj_type == "Coin":
                         f.write("\t\t<el type=\"Coin\" x=\""+ str(position[0]) +"\" y=\"" + str(position[1]) +"\" />\n")
                     elif obj_type == "Button":
@@ -160,8 +147,10 @@ def export_to_ozee(objects, filename: str):
                                 str(position[0]) +"\" y=\"" + str(position[1]) + "\" a=\"" + str(rotation) + "\" />\n")
                     elif obj_type == "Door" or obj_type == "Checkpoint":
                         back_objs.append(obj)
-
-        f.write("\t</middle>\n") # end middle layer
+        with open("include.txt","r") as incl:
+            includes = incl.read()
+        f.write(includes)
+        f.write("\n\t</middle>\n") # end middle layer
         f.write("\t<back>\n")
         for obj in back_objs: # maybe have a pre-parsing phase to not repeat this?
             name = obj[0]
@@ -175,9 +164,7 @@ def export_to_ozee(objects, filename: str):
             elif obj_type == "Checkpoint":
                 f.write("\t\t<el type=\"Checkpoint\" x=\""+ str(position[0]) +"\" y=\"" + str(round(position[1] + 1.3,2)) +"\" />\n")
         f.write("\t</back>\n")
-        # close the map
-        f.write("</map>")
-        pass
+        f.write("</map>") # close the map
     
     fend_time = time.perf_counter_ns()
     print("Exported " + str(len(objects)) + " objects in " + str((end_time - start_time) / 10**6) + " ms")
@@ -201,6 +188,7 @@ def main():
                 f.write(out_file)
     objects = import_from_gleed(in_file)
     export_to_ozee(objects, out_file)
+    #input()
 
 if __name__ == "__main__":
     main()
